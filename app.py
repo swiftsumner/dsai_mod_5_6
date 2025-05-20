@@ -23,7 +23,7 @@ def main():
         t = datetime.datetime.now()
         conn = sqlite3.connect('user.db')
         c = conn.cursor()
-        c.execute("insert into  users(name,timestamp) values(?,?)",(name, t))
+        c.execute("insert into  users(name,timestamp) values(?,?)",(name.lstrip(), t))
         conn.commit()
         c.close()
         conn.close()
@@ -63,6 +63,12 @@ def delete_log():
     c.close()
     conn.close()
     return(render_template("delete_log.html"))
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+    global first_time
+    first_time = 1
+    return(render_template("index.html"))
 
 if __name__ == "__main__":
     app.run()
