@@ -1,6 +1,6 @@
 #gemini
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 import google.generativeai as genai
 import os
 import sqlite3
@@ -18,15 +18,6 @@ def index():
 
 @app.route("/main",methods=["GET", "POST"])
 def main():
-    name = request.form.get("q")
-    if name:
-        t = datetime.datetime.now()
-        conn = sqlite3.connect('user.db')
-        c = conn.cursor()
-        c.execute("insert into  users(name,timestamp) values(?,?)",(name.lstrip(), t))
-        conn.commit()
-        c.close()
-        conn.close()
     return(render_template("main.html"))
 
 
@@ -69,6 +60,19 @@ def logout():
     global first_time
     first_time = 1
     return(render_template("index.html"))
+
+@app.route('/sql', methods=["POST"])
+def sql():
+    name = request.form.get("q")
+    if name:
+        t = datetime.datetime.now()
+        conn = sqlite3.connect('user.db')
+        c = conn.cursor()
+        c.execute("insert into  users(name,timestamp) values(?,?)",(name.lstrip(), t))
+        conn.commit()
+        c.close()
+        conn.close()
+    return redirect(url_for('main'))
 
 if __name__ == "__main__":
     app.run()
