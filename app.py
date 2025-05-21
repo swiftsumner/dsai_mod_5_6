@@ -57,8 +57,6 @@ def delete_log():
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
-    global first_time
-    first_time = 1
     return(render_template("index.html"))
 
 @app.route('/sql', methods=["POST"])
@@ -73,6 +71,15 @@ def sql():
         c.close()
         conn.close()
     return redirect(url_for('main'))
+
+@app.route("/paynow", methods=["GET", "POST"])
+def paynow():
+
+    return(render_template("paynow.html"))
+
+#@app.route("/telegram", methods=["GET", "POST"])
+#def telegram():
+#    return(render_template("telegram.html"))
 
 if __name__ == "__main__":
     app.run()

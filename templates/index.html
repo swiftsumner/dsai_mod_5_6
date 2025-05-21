@@ -9,7 +9,7 @@
 
         <form action="{{ url_for('sql') }}" method="post">
             <p>Please enter your user name: </p>
-            <input type="text", name="q" required>
+            <input type="text", name="q" required pattern="\S+.*">
             <input type="submit" value="Enter">
         </form>
         <form action = "/main" method="post">
