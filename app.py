@@ -5,6 +5,9 @@ import google.generativeai as genai
 import os
 import sqlite3
 import datetime
+import pandas as pd
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_error 
 
 gemini_api_key = os.getenv("GEMINI_KEY")
 genai.configure(api_key=gemini_api_key)
@@ -74,8 +77,17 @@ def sql():
 
 @app.route("/paynow", methods=["GET", "POST"])
 def paynow():
-
     return(render_template("paynow.html"))
+
+@app.route("/prediction", methods=["GET","POST"])
+def prediction():
+    return(render_template("prediction.html"))
+
+@app.route("/prediction_reply", methods=["GET","POST"])
+def prediction_reply():
+    q = float(request.form.get("q"))
+    return(render_template("prediction_reply.html", r=90.2 + (-50.6*q)))
+           
 
 #@app.route("/telegram", methods=["GET", "POST"])
 #def telegram():
