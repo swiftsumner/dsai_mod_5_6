@@ -86,15 +86,6 @@ def prediction():
 def prediction_reply():
     q = float(request.form.get("q"))
     return(render_template("prediction_reply.html", r=90.2 + (-50.6*q)))
-           
-
-@app.route("/telegram_page", methods=["GET", "POST"])
-def telegram_page():
-    domain_url = os.getenv('WEBHOOK_URL')
-    webhook_url = f"https://api.telegram.org/bot{telegram_token}/deleteWebhook"
-    requests.post(webhook_url, json={"url": domain_url, "drop_pending_updates": True})
-    status = "The telegram bot is not running. Click the button below to start it."
-    return(render_template("telegram.html", status=status))
 
 @app.route("/start_telegram", methods=["GET", "POST"])
 def start_telegram():
@@ -128,7 +119,8 @@ def telegram():
             # Process the message and generate a response
             system_prompt = "You are a financial expert. Answer ONLY questions related to finance, economics, investing and financial markets. If the question is not related to finance, state that you cannot answer it."
             #prompt = f"{system_prompt}\n\nUser Query: {text}"
-            r = model.generate_content(system_prompt + " " + text)
+            prompt = system_prompt + " " + text
+            r = model.generate_content(prompt)
             r_text = r.text
 
         # Send the response to the user
