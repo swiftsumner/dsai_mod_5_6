@@ -8,7 +8,7 @@ import requests
 from google import genai
 import markdown, markdown2
 
-telegram_token = os.getenv("TELEGRAM_TOKEN")
+telegram_token = os.getenv("TELEGRAM_TOKEN_2")
 gemini_api_key = os.getenv("GEMINI_KEY")
 #genai.configure(api_key=gemini_api_key)
 #model = genai.GenerativeModel("gemini-2.0-flash")
