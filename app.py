@@ -7,7 +7,6 @@ import sqlite3
 import datetime
 import requests
 
-WEBHOOK_URL = ""
 telegram_token = os.getenv("TELEGRAM_TOKEN")
 gemini_api_key = os.getenv("GEMINI_KEY")
 genai.configure(api_key=gemini_api_key)
@@ -100,9 +99,13 @@ def telegram_page():
 @app.route("/start_telegram", methods=["GET", "POST"])
 def start_telegram():
     domain_url = os.getenv('WEBHOOK_URL')
-    webhook_url = f"https://api.telegram.org/bot{telegram_token}/setWebhook?url={domain_url}/telegram-webhook"
+    
+    delete_webhook_url = f"https://api.telegram.org/bot{telegram_token}/deleteWebhook"
+    requests.post(delete_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
+
+    set_webhook_url = f"https://api.telegram.org/bot{telegram_token}/setWebhook?url={domain_url}/telegram"
     # set webhook url for telegram bot
-    webhook_response = requests.post(webhook_url, json={"url": domain_url, "drop_pending_updates": True})
+    webhook_response = requests.post(set_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
     print('webhook:', webhook_response)
     if webhook_response.status_code == 200:
         # set status message
@@ -110,17 +113,6 @@ def start_telegram():
     else:
         status = "Failed to start the telegram bot. Please check the logs."
     return(render_template("telegram.html", status=status))
-
-@app.route("/stop_telegram", methods=["GET", "POST"])
-def stop_telegram():
-    # Remove the webhook URL for the Telegram bot
-    webhook_url = f"https://api.telegram.org/bot{telegram_token}/deleteWebhook"
-    remove_webhook_response = requests.post(webhook_url)
-    if remove_webhook_response.status_code == 200:
-        status = "The telegram bot has stopped."
-    else:
-        status = "Unable to stop telegram. Please check logs."
-    return(render_template('telegram.html', status=status))
 
 @app.route("/telegram", methods=["GET", "POST"])
 def telegram():
@@ -137,11 +129,11 @@ def telegram():
             system_prompt = "You are a financial expert. Answer ONLY questions related to finance, economics, investing and financial markets. If the question is not related to finance, state that you cannot answer it."
             prompt = f"{system_prompt}\n\nUser Query: {text}"
             r = model.generate_content(prompt)
-            r.text = r.text
+            r_text = r.text
 
         # Send the response to the user
         send_message_url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
-        requests.post(send_message_url, data={"chat_id": chat_id, "text": r.text})
+        requests.post(send_message_url, data={"chat_id": chat_id, "text": r_text})
 
     # Return a 200 OK response to Telegram to acknowledge that message was received
     return('ok', 200)
