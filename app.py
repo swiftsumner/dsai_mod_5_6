@@ -12,8 +12,6 @@ telegram_token = os.getenv("TELEGRAM_TOKEN")
 gemini_api_key = os.getenv("GEMINI_KEY")
 genai.configure(api_key=gemini_api_key)
 model = genai.GenerativeModel("gemini-2.0-flash")
-gemini_client = genai.Client(api_key=gemini_api_key)
-gemini_model = "gemini-2.0-flash"
 
 app = Flask(__name__)
 
@@ -104,7 +102,7 @@ def start_telegram():
     domain_url = os.getenv('WEBHOOK_URL')
     webhook_url = f"https://api.telegram.org/bot{telegram_token}/setWebhook?url={domain_url}/telegram-webhook"
     # set webhook url for telegram bot
-    webhook_response = requests.post(set_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
+    webhook_response = requests.post(webhook_url, json={"url": domain_url, "drop_pending_updates": True})
     print('webhook:', webhook_response)
     if webhook_response.status_code == 200:
         # set status message
@@ -124,7 +122,7 @@ def stop_telegram():
         status = "Unable to stop telegram. Please check logs."
     return(render_template('telegram.html', status=status))
 
-@app.route("telegram", methods=["GET", "POST"])
+@app.route("/telegram", methods=["GET", "POST"])
 def telegram():
     update = request.get_json()
     if "message" in update and "text" in update["message"]:
@@ -138,10 +136,7 @@ def telegram():
             # Process the message and generate a response
             system_prompt = "You are a financial expert. Answer ONLY questions related to finance, economics, investing and financial markets. If the question is not related to finance, state that you cannot answer it."
             prompt = f"{system_prompt}\n\nUser Query: {text}"
-            r = gemini_client.models.generate_content(
-                model = gemini_model,
-                contents=prompt
-            )
+            r = model.generate_content(prompt)
             r.text = r.text
 
         # Send the response to the user
