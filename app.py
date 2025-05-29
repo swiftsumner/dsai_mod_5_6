@@ -1,7 +1,7 @@
 #gemini
 
 from flask import Flask, request, render_template, redirect, url_for
-import google.generativeai as genai
+from google import genai
 import os
 import sqlite3
 import datetime
@@ -9,8 +9,8 @@ import requests
 
 telegram_token = os.getenv("TELEGRAM_TOKEN")
 gemini_api_key = os.getenv("GEMINI_KEY")
-genai.configure(api_key=gemini_api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
+gemini_client = genai.Client(api_key=gemini_api_key)
+gemini_model = "gemini-2.0-flash"
 
 app = Flask(__name__)
 
@@ -31,7 +31,10 @@ def gemini():
 def gemini_reply():
     q = request.form.get("q")
     #gemini
-    r = model.generate_content(q)
+    r = gemini_client.models.generate_content(
+        model=gemini_model,
+        contents = q
+    )
     return(render_template("gemini_reply.html", r=r.text))
 
 @app.route("/user_log",methods=["GET", "POST"])
@@ -128,7 +131,10 @@ def telegram():
             # Process the message and generate a response
             system_prompt = "You are a financial expert. Answer ONLY questions related to finance, economics, investing and financial markets. If the question is not related to finance, state that you cannot answer it."
             prompt = f"{system_prompt}\n\nUser Query: {text}"
-            r = model.generate_content(prompt)
+            r = gemini_client.models.generate_content(
+                model=gemini_model,
+                contents = prompt
+            )
             r_text = r.text
 
         # Send the response to the user
