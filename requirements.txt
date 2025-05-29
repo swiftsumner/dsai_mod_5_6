@@ -3,3 +3,5 @@ gunicorn
 google-generativeai
 requests
 google-genai
+markdown
+markdown2

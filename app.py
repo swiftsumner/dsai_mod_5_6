@@ -1,16 +1,19 @@
 #gemini
 
 from flask import Flask, request, render_template, redirect, url_for
-import google.generativeai as genai
 import os
 import sqlite3
 import datetime
 import requests
+from google import genai
+import markdown, markdown2
 
 telegram_token = os.getenv("TELEGRAM_TOKEN")
 gemini_api_key = os.getenv("GEMINI_KEY")
-genai.configure(api_key=gemini_api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
+#genai.configure(api_key=gemini_api_key)
+#model = genai.GenerativeModel("gemini-2.0-flash")
+gemini_client = genai.Client(api_key=gemini_api_key )
+gemini_model = "gemini-2.0-flash"
 
 app = Flask(__name__)
 
@@ -31,8 +34,18 @@ def gemini():
 def gemini_reply():
     q = request.form.get("q")
     #gemini
-    r = model.generate_content(q)
-    return(render_template("gemini_reply.html", r=r.text))
+    #r = model.generate_content(q)
+    #return(render_template("gemini_reply.html", r=r.text))
+    r = genmini_client.models.generate_content(
+        model=genmini_model,
+        contents=q
+    )
+    r_html = markdown.markdown(
+            r.text if r.text is not None else "",
+            extensions=["fenced_code", "codehilite"]  
+    )
+    return(render_template("gemini_reply.html",r=r_html))
+
 
 @app.route("/user_log",methods=["GET", "POST"])
 def user_log():
@@ -116,11 +129,14 @@ def telegram():
         if text == "/start":
             r_text = "Welcome! You can ask me any finance-related questions."
         else:
-            # Process the message and generate a response
-            system_prompt = "You are a financial expert. Answer ONLY questions related to finance, economics, investing and financial markets. If the question is not related to finance, state that you cannot answer it."
-            #prompt = f"{system_prompt}\n\nUser Query: {text}"
-            r = model.generate_content(text)
-            r_text = r.text
+            system_prompt = "You are a financial expert.  Answer ONLY questions related to finance, economics, investing, and financial markets. If the question is not related to finance, state that you cannot answer it."
+            prompt = f"{system_prompt}\n\nUser Query: {text}"
+            r = genmini_client.models.generate_content(
+                model=genmini_model,
+                contents=prompt
+            )
+            r_text = r.text if r.text is not None else ""
+            r_text = r_text.replace('**','')
 
         # Send the response to the user
         send_message_url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
