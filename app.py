@@ -36,8 +36,8 @@ def gemini_reply():
     #gemini
     #r = model.generate_content(q)
     #return(render_template("gemini_reply.html", r=r.text))
-    r = genmini_client.models.generate_content(
-        model=genmini_model,
+    r = gemini_client.models.generate_content(
+        model=gemini_model,
         contents=q
     )
     r_html = markdown.markdown(
@@ -131,8 +131,8 @@ def telegram():
         else:
             system_prompt = "You are a financial expert.  Answer ONLY questions related to finance, economics, investing, and financial markets. If the question is not related to finance, state that you cannot answer it."
             prompt = f"{system_prompt}\n\nUser Query: {text}"
-            r = genmini_client.models.generate_content(
-                model=genmini_model,
+            r = gemini_client.models.generate_content(
+                model=gemini_model,
                 contents=prompt
             )
             r_text = r.text if r.text is not None else ""
