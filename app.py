@@ -8,6 +8,7 @@ import requests
 from google import genai
 import markdown, markdown2
 
+temp_telegram_token = os.getenv("TELEGRAM_TOKEN")
 telegram_token = os.getenv("TELEGRAM_TOKEN_2")
 gemini_api_key = os.getenv("GEMINI_KEY")
 #genai.configure(api_key=gemini_api_key)
@@ -99,6 +100,16 @@ def prediction():
 def prediction_reply():
     q = float(request.form.get("q"))
     return(render_template("prediction_reply.html", r=90.2 + (-50.6*q)))
+
+@app.route("/stop_telegram", methods=["GET", "POST"])
+def stop_telegram():
+    domain_url = os.getenv('WEBHOOK_URL')
+    
+    delete_webhook_url = f"https://api.telegram.org/bot{temp_telegram_token}/deleteWebhook"
+    requests.post(delete_webhook_url, json={"url": domain_url, "drop_pending_updates": True})
+
+    return(render_template("telegram.html"))
+
 
 @app.route("/start_telegram", methods=["GET", "POST"])
 def start_telegram():
