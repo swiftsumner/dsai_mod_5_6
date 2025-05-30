@@ -55,7 +55,7 @@ def user_log():
     r=""
     for row in c:
         print(row)
-        r=r+str(row)
+        r=r+str(row) + '\n'
     c.close()
     conn.close()
     return(render_template("user_log.html", r=r))
