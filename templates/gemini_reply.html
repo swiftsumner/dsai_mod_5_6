@@ -5,7 +5,7 @@
 <body>
     <div class="container">
         <h2>Gemini Reply</h2>
-        <p>{{r}}</p>
+        <div class="markdown-box">{{r | safe}}</div>
         <form action="/main" method="post">
             <input type="submit" value="Main">
         </form>
