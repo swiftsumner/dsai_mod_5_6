@@ -93,7 +93,10 @@ def prediction():
 
 @app.route("/prediction_reply", methods=["GET","POST"])
 def prediction_reply():
-    q = float(request.form.get("q"))
+    try:
+        q = float(request.form.get("q"))
+    except ValueError:
+        return render_template("prediction.html", r="Invalid input: Please enter a valid number.")
     return(render_template("prediction_reply.html", r=90.2 + (-50.6*q)))
 
 @app.route("/start_telegram", methods=["GET", "POST"])
