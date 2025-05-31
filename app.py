@@ -10,8 +10,6 @@ import markdown, markdown2
 
 telegram_token = os.getenv("TELEGRAM_TOKEN_2")
 gemini_api_key = os.getenv("GEMINI_KEY")
-#genai.configure(api_key=gemini_api_key)
-#model = genai.GenerativeModel("gemini-2.0-flash")
 gemini_client = genai.Client(api_key=gemini_api_key )
 gemini_model = "gemini-2.0-flash"
 
@@ -34,8 +32,6 @@ def gemini():
 def gemini_reply():
     q = request.form.get("q")
     #gemini
-    #r = model.generate_content(q)
-    #return(render_template("gemini_reply.html", r=r.text))
     r = gemini_client.models.generate_content(
         model=gemini_model,
         contents=q

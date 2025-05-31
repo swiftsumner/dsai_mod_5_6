@@ -18,6 +18,8 @@ body {
     max-width: 400px;
     width: 100%;
     text-align: center;
+    height: 580px;
+    overflow:auto;
 }
 
 .image-class {
